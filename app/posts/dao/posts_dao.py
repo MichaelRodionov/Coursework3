@@ -70,3 +70,8 @@ class PostsDAO:
                         words[index] = word
                 tags_word.append(word)
         return " ".join(words)
+
+    def get_count_bookmarks(self):
+        with open('./data/bookmarks.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            return data

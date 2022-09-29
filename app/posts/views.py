@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from .dao.posts_dao import PostsDAO
 
 
@@ -6,10 +6,12 @@ posts_blueprint = Blueprint('posts_blueprint', __name__, template_folder='templa
 posts_dao = PostsDAO('./data/posts.json')
 
 
-@posts_blueprint.route('/')
+@posts_blueprint.route('/', methods=['GET', 'POST'])
 def main_page():
-    posts: list[dict] = posts_dao.get_all()
-    return render_template('index.html', title='Main page', posts=posts)
+    if request.method == 'GET':
+        posts: list[dict] = posts_dao.get_all()
+        bookmarks = posts_dao.get_count_bookmarks()
+        return render_template('index.html', title='Main page', posts=posts, bookmarks=bookmarks)
 
 
 @posts_blueprint.route('/users/<user_name>', methods=['GET'])
