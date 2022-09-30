@@ -15,8 +15,8 @@ class TestPostsDAO:
         assert posts.get_by_user("leo")[0]["poster_name"] == "leo"
 
     def test_search_for_posts(self):
-        pass
-    # TODO: need finish
+        all_posts = posts.get_all()
+        assert 'еда' in all_posts[0]['content']
 
     def test_get_by_pk(self):
         assert type(posts.get_by_pk(1)) == dict
@@ -28,3 +28,7 @@ class TestPostsDAO:
 
     def test_load_comments(self):
         assert type(posts.load_comments()) == list
+
+
+    def test_tags_create(self,):
+        pass

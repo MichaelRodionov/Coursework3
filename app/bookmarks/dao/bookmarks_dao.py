@@ -13,14 +13,17 @@ class BookmarksDAO:
 
     def add_post_to_bookmarks(self, post):
         bookmarks = self.get_all_bookmarks()
-        with open(self.path, 'w', encoding='utf-8') as file:
-            bookmarks.append(post)
-            json.dump(bookmarks, fp=file, ensure_ascii=False, indent=4)
+        bookmarks_pk = [bookmark["pk"] for bookmark in bookmarks]
+        if post["pk"] not in bookmarks_pk:
+            with open(self.path, 'w', encoding='utf-8') as file:
+                bookmarks.append(post)
+                json.dump(bookmarks, fp=file, ensure_ascii=False, indent=4)
 
     def delete_post_from_bookmarks(self, pk):
         bookmarks: list[dict] = self.get_all_bookmarks()
-        for bookmark in bookmarks:
+        for index, bookmark in enumerate(bookmarks):
             if bookmark['pk'] == pk:
-                with open(self.path, 'w', encoding='utf-8') as file:
-                    bookmarks.remove(bookmark)
-                    json.dump(bookmarks, fp=file, ensure_ascii=False, indent=4)
+                del bookmarks[index]
+                break
+        with open(self.path, 'w', encoding='utf-8') as file:
+            json.dump(bookmarks, fp=file, ensure_ascii=False, indent=4)

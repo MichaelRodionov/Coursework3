@@ -1,17 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from .dao.posts_dao import PostsDAO
-
+from flask import Blueprint, render_template, request
+from app.posts.dao.posts_dao import PostsDAO
+from app.bookmarks.dao.bookmarks_dao import BookmarksDAO
 
 posts_blueprint = Blueprint('posts_blueprint', __name__, template_folder='templates')
 posts_dao = PostsDAO('./data/posts.json')
+bookmarks_dao = BookmarksDAO('./data/bookmarks.json')
 
 
-@posts_blueprint.route('/', methods=['GET', 'POST'])
+@posts_blueprint.route('/')
 def main_page():
-    if request.method == 'GET':
-        posts: list[dict] = posts_dao.get_all()
-        bookmarks = posts_dao.get_count_bookmarks()
-        return render_template('index.html', title='Main page', posts=posts, bookmarks=bookmarks)
+    posts: list[dict] = posts_dao.get_all()
+    bookmarks = bookmarks_dao.get_all_bookmarks()
+    return render_template('index.html', title='Main page', posts=posts, bookmarks=bookmarks)
 
 
 @posts_blueprint.route('/users/<user_name>', methods=['GET'])
@@ -31,19 +31,12 @@ def get_posts_by_query():
 def get_post_by_post_id(post_id):
     post = posts_dao.get_by_pk(post_id)
     comments = posts_dao.get_comments_by_post_pk(post_id)
-    words = posts_dao.tag(post_id)
-    return render_template('post.html', title=post_id, post=post, comments=comments, words=words)
+    words = posts_dao.tags_create(post_id)
+    return render_template('post.html', title=post_id, post=post, comments=comments, word=words)
 
 
-@posts_blueprint.route('/tag/<tag>')
-def get_tag_list(tag):
-    posts_list = posts_dao.get_all()
-    posts = []
-    for post in posts_list:
-        for word in post['content'].split():
-            if word == f'#{tag}':
-                posts.append(post)
-    if len(posts) == 0:
-        return render_template('empty_tag_list.html', title='No tags found', tag=tag)
-    else:
-        return render_template('index.html', posts=posts, title=tag)
+@posts_blueprint.route("/tag/<tag_name>")
+def page_tag(tag_name):
+    tag_name = "#" + tag_name
+    posts = posts_dao.search_for_posts(tag_name)
+    return render_template("tag.html", posts=posts, tag=tag_name)

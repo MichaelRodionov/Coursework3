@@ -20,10 +20,9 @@ class PostsDAO:
         :return: list of posts with 'user_name'
         """
         posts = self.get_all()
-        user_posts = []
-        for post in posts:
-            if user_name == post['poster_name']:
-                user_posts.append(post)
+        user_posts = [post for post in posts if user_name == post['poster_name']]
+        if not user_posts:
+            raise ValueError("Нет такого пользователя")
         return user_posts
 
     def search_for_posts(self, query) -> list[dict]:
@@ -31,10 +30,7 @@ class PostsDAO:
         :return: list of posts, sorted by query
         """
         posts = self.get_all()
-        posts_by_query = []
-        for post in posts:
-            if query.lower() in post['content'].lower():
-                posts_by_query.append(post)
+        posts_by_query = [post for post in posts if query.lower() in post['content'].lower()]
         return posts_by_query
 
     def get_by_pk(self, post_id) -> dict:
@@ -53,25 +49,23 @@ class PostsDAO:
     def get_comments_by_post_pk(self, post_pk):
         comments = self.load_comments()
         post_comments = [comment for comment in comments if comment["post_id"] == post_pk]
+        if not post_comments:
+            raise ValueError("У поста нет комментариев")
         return post_comments
 
-    def tag(self, pk):
+    def tags_create(self, pk):
         post = self.get_by_pk(pk)
-        words = post["content"].split()
-        marks = '''!()-[]{};?@$%:'"\,.^&;*_'''
-        tags_word = []
+        text = post["content"]
+        words = text.split()
         for index, word in enumerate(words):
             if word.startswith("#"):
-                word = word[1:]
-                word = word.replace(word, f"<a href='/tag/{word}'>#{word}</a>")
-                for i in word:
-                    if i in marks:
-                        word = word.replace(i, "")
-                        words[index] = word
-                tags_word.append(word)
+                if word[1:].isalpha():
+                    word = word[1:]
+                    word = word.replace(word, f"<a href='/tag/{word}'>#{word}</a>")
+                    words[index] = word
+                else:
+                    sym = word[-1]
+                    word = word[1:-1]
+                    word = word.replace(word, f"<a href='/tag/{word}'>#{word}</a>")
+                    words[index] = word + sym
         return " ".join(words)
-
-    def get_count_bookmarks(self):
-        with open('./data/bookmarks.json', 'r', encoding='utf-8') as file:
-            data = json.load(file)
-            return data

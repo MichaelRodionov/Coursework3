@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, url_for, redirect, jsonify
+from flask import Blueprint, render_template, url_for, redirect
 from app.posts.views import posts_dao
-from .dao.bookmarks_dao import BookmarksDAO
+from app.bookmarks.dao.bookmarks_dao import BookmarksDAO
 
 bookmarks_blueprint = Blueprint('bookmarks_blueprint', __name__, template_folder='templates', url_prefix='/bookmarks')
 bookmarks_dao = BookmarksDAO('./data/bookmarks.json')
@@ -19,6 +19,8 @@ def add_post_to_bookmark(pk):
     return redirect(url_for('posts_blueprint.main_page'))
 
 
-@bookmarks_blueprint.route('/remove/<int:post_id>', methods=['GET'])
+@bookmarks_blueprint.route('/remove/<int:post_id>', methods=["GET", 'DELETE'])
 def remove_post_from_bookmark(post_id):
     bookmarks_dao.delete_post_from_bookmarks(post_id)
+    return redirect("/", code=302)
+

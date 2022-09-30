@@ -1,11 +1,13 @@
 import pytest
 from run import app
 
-valid_keys = {"poster_name",
-              "poster_avatar",
-              "pic", "content", "views_count",
-              "likes_count",
-              "pk"}
+valid_keys = {
+    "poster_name",
+    "poster_avatar",
+    "pic", "content", "views_count",
+    "likes_count",
+    "pk"
+}
 
 
 class TestApi:

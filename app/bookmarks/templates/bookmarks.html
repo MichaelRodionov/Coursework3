@@ -34,7 +34,7 @@
             </div>
             <span class="item__username">{{ bookmark.poster_name }}</span>
           </a>
-          <a href="/remove/{{ bookmark.pk }}" class="item__delete">Удалить</a>
+          <a href="/bookmarks/remove/{{ bookmark.pk }}" class="item__delete">Удалить</a>
         </div>
         <a href="/app/posts/templates/post.html/post.html" class="item__post-link">
           <img src="{{ bookmark.pic }}" alt="" width="348" class="item__post-img">
